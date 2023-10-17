@@ -1,0 +1,34 @@
+#######################################
+# CRC16
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+CRC16Model KEYWORD1
+CRC16 KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+setModel KEYWORD2
+updateRaw KEYWORD2
+update KEYWORD2
+get KEYWORD2
+clear KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+CRC16IBM LITERAL1
+CRC16MAXIM LITERAL1
+CRC16USB LITERAL1
+CRC16MODBUS LITERAL1
+CRC16CCITT LITERAL1
+CRC16CCITT_False LITERAL1
+CRC16X25 LITERAL1
+CRC16XMODEM LITERAL1
+CRC16DNP LITERAL1
