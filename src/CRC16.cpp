@@ -1,6 +1,7 @@
 #include "CRC16.h"
 
-/*Reflect Calculations*/
+#ifndef CRC16NoCache
+/*Reflect Cache Calculations*/
 uint8_t reflectLookupTable[] = {
   0,128,64,192,32,160,96,224,16,144,80,208,48,176,112,240,
   8,136,72,200,40,168,104,232,24,152,88,216,56,184,120,248,
@@ -20,6 +21,47 @@ uint8_t reflectLookupTable[] = {
   247,15,143,79,207,47,175,111,239,31,159,95,223,63,191,127,255,
 };
 
+uint8_t CRC16::reflectFast(uint8_t data){
+  return reflectLookupTable[data];
+}
+
+typedef struct uint16_fast {
+  uint8_t low;
+  uint8_t high;
+}uint16_f;
+
+uint16_t CRC16::reflectFast(uint16_t data){
+  return reflectLookupTable[((uint16_f*)&data)->high] | (reflectLookupTable[((uint16_f*)&data)->low] << 8);
+}
+
+void CRC16::updateFast(uint8_t data) {
+  data = reflectIn ? reflect(data) : data;
+  crc = (crc << 8) ^ crcTable[(crc >> 8) ^ data];
+}
+
+void CRC16::updateFast(uint8_t *data, uint32_t len){
+  for(uint32_t i=0; i<len; i++)
+    update(data[i]);
+}
+#endif
+
+
+uint8_t CRC16::reflect(uint8_t data){
+#ifndef CRC16NoCache
+  return reflectFast(data);
+#else
+  return reflectRaw(data);
+#endif
+}
+
+uint16_t CRC16::reflect(uint16_t data){
+#ifndef CRC16NoCache
+  return reflectFast(data);
+#else
+  return reflectRaw(data);
+#endif
+}
+
 uint8_t CRC16::reflectRaw(uint8_t data){
   uint8_t reflection = 0x00;
   for (int8_t bit = 7; bit >= 0; bit--){
@@ -38,25 +80,28 @@ uint16_t CRC16::reflectRaw(uint16_t data){
   return reflection;
 }
 
-uint8_t CRC16::reflect(uint8_t data){
-  return reflectLookupTable[data];
-}
-
-typedef struct uint16_fast {
-  uint8_t low;
-  uint8_t high;
-}uint16_f;
-
-uint16_t CRC16::reflect(uint16_t data){
-  return reflectLookupTable[((uint16_f*)&data)->high] | (reflectLookupTable[((uint16_f*)&data)->low] << 8);
-}
-
 /*CRC Calculations*/
 uint16_t CRC16::calc(uint8_t data) {
   uint16_t tCRC = data << 8;
   for (int i = 0; i < 8; i++) 
       tCRC = (tCRC << 1) ^ ((tCRC & 0x8000) ? polynomial : 0);
   return tCRC;
+}
+
+void CRC16::update(uint8_t data) {
+#ifndef CRC16NoCache
+  return updateFast(data);
+#else
+  return updateRaw(data);
+#endif
+}
+
+void CRC16::update(uint8_t *data, uint32_t len){
+#ifndef CRC16NoCache
+  return updateFast(data,len);
+#else
+  return updateRaw(data,len);
+#endif
 }
 
 void CRC16::updateRaw(uint8_t data) {
@@ -68,16 +113,6 @@ void CRC16::updateRaw(uint8_t data) {
 void CRC16::updateRaw(uint8_t *data, uint32_t len){
   for(uint32_t i=0; i<len; i++)
     updateRaw(data[i]);
-}
-
-void CRC16::update(uint8_t data) {
-  data = reflectIn ? reflect(data) : data;
-  crc = (crc << 8) ^ crcTable[(crc >> 8) ^ data];
-}
-
-void CRC16::update(uint8_t *data, uint32_t len){
-  for(uint32_t i=0; i<len; i++)
-    update(data[i]);
 }
 
 /*CRC Operations*/
