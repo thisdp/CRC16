@@ -142,7 +142,7 @@ void CRC16::clear(){
 }
 
 uint16_t CRC16::get(){
-    return (reflectOut?reflect(crc):crc)^xorOut;
+  return (reflectOut?reflect(crc):crc)^xorOut;
 }
 
 void CRC16::genCRCTable(){
