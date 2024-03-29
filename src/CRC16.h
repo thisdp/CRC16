@@ -33,7 +33,6 @@ public:
   void clear();
 private:
   #ifndef CRC16NoCache
-  uint8_t reflectTable[256];
   uint16_t crcTable[256];
   void updateFast(uint8_t data);
   void updateFast(uint8_t *data, uint32_t len);
