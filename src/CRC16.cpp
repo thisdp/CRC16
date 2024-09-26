@@ -46,19 +46,17 @@ void CRC16::updateFast(uint8_t data) {
 }
 
 void CRC16::updateFast(uint8_t *data, uint32_t len){
-  for(uint32_t i=0; i<len; i++)
-    reflect(data[i]);
+  for(uint32_t i=0; i<len; i++) updateFast(data[i]);
 }
 
 void CRC16::updateRaw(uint8_t data) {
   crc ^= (reflectIn ? reflect(data) : data) << 8;
   for (int i = 0; i < 8; i++)
-      crc = (crc << 1) ^ ((crc & 0x8000) ? polynomial : 0);
+    crc = (crc << 1) ^ ((crc & 0x8000) ? polynomial : 0);
 }
 
 void CRC16::updateRaw(uint8_t *data, uint32_t len){
-  for(uint32_t i=0; i<len; i++)
-    updateRaw(data[i]);
+  for(uint32_t i=0; i<len; i++) updateRaw(data[i]);
 }
 
 /*CRC Operations*/
@@ -74,7 +72,9 @@ CRC16::CRC16(CRC16Model cfg, bool useCache){
   if(useCache){
     CRC16GenerateReflectCache();
     CRC16CRCCache = new uint16_t[256];
-    for(uint16_t i=0; i<=255; i++) CRC16CRCCache[i] = calc(i);
+    for(uint16_t i=0; i<=255; i++){
+      CRC16CRCCache[i] = calc(i);
+    }
   }
 }
 
@@ -109,17 +109,19 @@ uint16_t CRC16::get(){
 }
 
 void CRC16::update(uint8_t data){
-  if(CRCUseCache)
+  if(CRCUseCache){
     updateFast(data);
-  else
+  }else{
     updateRaw(data);
+  }
 }
 
 void CRC16::update(uint8_t *data, uint32_t length){
-  if(CRCUseCache)
+  if(CRCUseCache){
     updateFast(data, length);
-  else
+  }else{
     updateRaw(data, length);
+  }
 }
 
 uint8_t CRC16::reflect(uint8_t data){
