@@ -1,9 +1,12 @@
 #include "CRC16.h"
 
+#pragma pack(push)
+#pragma pack(1)
 typedef struct uint16_fast {
   uint8_t low;
   uint8_t high;
 }uint16_f;
+#pragma pack(pop)
 
 uint16_t *CRC16ReflectCache = 0;
 /*Reflect Cache Calculations*/
