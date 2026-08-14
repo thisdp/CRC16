@@ -2,10 +2,12 @@
 
 #pragma pack(push)
 #pragma pack(1)
-typedef struct uint16_fast {
-  uint8_t low;
-  uint8_t high;
-}uint16_f;
+typedef union {
+	uint16_t value;
+	struct {
+		uint8_t low, high;
+	} bytes;
+} uint16_f;
 #pragma pack(pop)
 
 uint16_t *CRC16ReflectCache = 0;
@@ -24,7 +26,9 @@ uint8_t CRC16::reflectFast(uint8_t data){
 }
 
 uint16_t CRC16::reflectFast(uint16_t data){
-  return CRC16ReflectCache[((uint16_f*)&data)->high] | (CRC16ReflectCache[((uint16_f*)&data)->low] << 8);
+  uint16_f fData;
+  fData.value = data;
+  return CRC16ReflectCache[fData.bytes.high] | (CRC16ReflectCache[fData.bytes.low] << 8);
 }
 
 uint8_t CRC16::reflectRaw(uint8_t data){
@@ -32,7 +36,9 @@ uint8_t CRC16::reflectRaw(uint8_t data){
 }
 
 uint16_t CRC16::reflectRaw(uint16_t data){
-  return ((((uint16_f*)&data)->high * 0x0202020202ULL & 0x010884422010ULL) % 1023)|(((((uint16_f*)&data)->low * 0x0202020202ULL & 0x010884422010ULL) % 1023)<<8);
+  uint16_f fData;
+  fData.value = data;
+  return ((fData.bytes.high * 0x0202020202ULL & 0x010884422010ULL) % 1023)|(((fData.bytes.low * 0x0202020202ULL & 0x010884422010ULL) % 1023)<<8);
 }
 
 /*CRC Calculations*/
